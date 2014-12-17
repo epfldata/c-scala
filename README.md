@@ -19,6 +19,8 @@ provided that:
 
   * The JNI headers for your system are as specified in `project/Build.scala`.
 
+Please note that this has been tested only on Mac OS 10.9+.
+
 
 The core C language
 -------------------
@@ -56,18 +58,18 @@ println(*(x))
 Note: currently, calling `&` on the same value twice will return pointers to
 different copies of the value.
 
-It is possible to perform pointer arithmetic using the `pointer_add` and
-`pointer_sub` methods. Assignment is possible using `pointer_assign`. For
-example, using `malloc` from the `cscala.StdLib` pacakge it is possible to write
-array-like operations:
+It is possible to perform pointer arithmetic using the `+` and `-` methods.
+Assignment is possible using `pointer_assign` or `update`. For example, using
+`malloc` from the `cscala.StdLib` package it is possible to write array-like
+operations:
 
 ```scala
 val array: Pointer[Int] = malloc[Int](5) // Allocates space for 5 integers
 for (i <- 0 until 5) {
-  pointer_assign(pointer_add(array, i), i)
+  array(i) = i
 }
 
-println(*(pointer_add(array, 3)))
+println(*(array + 3))
 // => 3
 ```
 
@@ -91,7 +93,7 @@ implicit val CTimeValInfo: CStructInfo[CTimeVal] = new CStructInfo[CTimeVal] {
 }
 ```
 
-Structs can be created using `malloc`, `pointer_assign` and `pointer_add`, or by
+Structs can be created using `malloc`, `pointer_assign` and `+`, or by
 simply creating a new instance of the `CStruct`. Member selection in pointers to
 structs can be done using the `->` method:
 
@@ -168,8 +170,7 @@ Issues
     needs type parameters all the time, and declaration can be done more easily
     (e.g. just a case class).
 
-  * The `pointer_add` and `pointer_sub` methods, as well as the `->` method
-    should be methods on `Pointer[T]`, perhaps via an implicit class.
+  * The `->` method should be on the `PointerOps` implicit class.
 
   * Casting is only partly implemented.
 
